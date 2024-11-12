@@ -1,0 +1,28 @@
+from flask import Flask
+import os
+import time
+import psutil
+
+app = Flask(__name__)
+
+def get_top_output():
+    processes = [f"PID {p.pid} - Name: {p.info['name']} - CPU: {p.info['cpu_percent']}%"
+                 for p in psutil.process_iter(['name', 'cpu_percent'])][:10]
+    return "\n".join(processes)
+
+@app.route('/htop')
+def htop():
+    name = "Rohit Bahadur Bista"
+    username = os.getenv('USER', 'unknown')
+    server_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    top_output = get_top_output()
+    return f"""
+    <h1>System Information</h1>
+    <p><strong>Name:</strong> {name}</p>
+    <p><strong>Username:</strong> {username}</p>
+    <p><strong>Server Time (IST):</strong> {server_time}</p>
+    <pre><strong>TOP output: \n{top_output}</pre>
+    """
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=8080)
